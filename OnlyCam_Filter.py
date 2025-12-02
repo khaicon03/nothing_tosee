@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# unfull ver
+
 import rospy
 import cv2
 import numpy as np
@@ -82,7 +82,7 @@ class DualRowFollowerROI:
         left_max  = int(w * self.left_max_x_ratio)
         right_min = int(w * self.right_min_x_ratio)
         right_max = int(w * self.right_max_x_ratio)
-
+  
         # duyệt tất cả line
         if lines is not None:
             for l in lines:
