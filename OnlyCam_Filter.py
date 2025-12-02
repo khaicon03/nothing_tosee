@@ -134,7 +134,7 @@ class DualRowFollowerROI:
 
         # ======== DEBUG HIỂN THỊ ========
         if self.show_debug:
-            # ----- 1) VẼ TRÊN ROI (giống đoạn cũ) -----
+            # ----- 1) VẼ TRÊN ROI -----
             roi_vis = roi.copy()
             roi_h, roi_w, _ = roi_vis.shape
 
@@ -152,10 +152,22 @@ class DualRowFollowerROI:
             cx_roi = int(self.center_ratio * roi_w)
             cv2.line(roi_vis, (cx_roi, 0), (cx_roi, roi_h - 1), (255, 0, 255), 1)
 
-            # vẽ tất cả line Hough (raw) trong ROI
+            # vẽ các line Hough đã LỌC GÓC (>= min_angle_deg)
             if lines is not None:
                 for l in lines:
                     x1_l, y1_l, x2_l, y2_l = l[0]
+                    dx = x2_l - x1_l
+                    dy = y2_l - y1_l
+
+                    angle = np.degrees(np.arctan2(dy, dx))
+                    angle = abs(angle)
+                    if angle > 90.0:
+                        angle = 180.0 - angle
+
+                    # bỏ line gần nằm ngang
+                    if angle < self.min_angle_deg:
+                        continue
+
                     cv2.line(roi_vis, (x1_l, y1_l), (x2_l, y2_l), (0, 0, 255), 2)
 
             # vẽ các x đã chọn làm luống (sau khi lọc góc + vùng)
@@ -186,13 +198,12 @@ class DualRowFollowerROI:
             for x in right_xs:
                 cv2.line(frame_vis, (x, y1), (x, y2), (0, 255, 255), 1)
 
-            # ----- 3) HIỂN THỊ CỬA SỔ GIỐNG test.py -----
+            # ----- 3) HIỂN THỊ -----
             cv2.imshow("Frame with ROI + rows", frame_vis)
             cv2.imshow("ROI_with_lines", roi_vis)
             cv2.imshow("Edges", edges)
             cv2.waitKey(1)
-            # =================================
-            # =========== Hết DEBUG ===========
+    # =========== Hết DEBUG ===========
 
         # Điều khiển
         cmd = Twist()
