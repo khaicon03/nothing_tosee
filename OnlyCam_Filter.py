@@ -50,7 +50,8 @@ class DualRowFollowerROI:
         # NGƯỠNG GÓC (ý từ test.py):
         # chỉ giữ các line có góc so với trục NẰM (x) >= min_angle_deg
         # (0° = nằm ngang, 90° = dựng đứng)
-        self.min_angle_deg = rospy.get_param("~min_angle_deg", 35.0)
+        # ép ngưỡng tối thiểu 35°: không cho phép giảm xuống thấp hơn
+        self.min_angle_deg = max(35.0, rospy.get_param("~min_angle_deg", 35.0))
 
         # subscriber camera
         rospy.Subscriber(self.image_topic, Image, self.image_callback)
